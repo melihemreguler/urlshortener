@@ -4,3 +4,7 @@ spring:
       uri: ${SPRING_DATA_MONGODB_URI}
 server:
   port: 8080
+logging:
+  level:
+    root: INFO
+    com.github.melihemreguler: DEBUG
