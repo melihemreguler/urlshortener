@@ -1,11 +1,11 @@
 package com.github.melihemreguler.urlshortener.service;
 
+import com.github.melihemreguler.urlshortener.config.AppConfig;
+import com.github.melihemreguler.urlshortener.dto.UrlDto;
 import com.github.melihemreguler.urlshortener.exception.UrlNotFoundException;
-import com.github.melihemreguler.urlshortener.model.Url;
 import com.github.melihemreguler.urlshortener.repository.UrlRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,17 +16,13 @@ import java.util.UUID;
 public class UrlService {
 
     private final UrlRepository urlRepository;
-    @Value("${SHORT_URL_DOMAIN}")
-    private String shortUrlDomain;
-    @Value("${LONG_URL_DOMAIN}")
-    private String longUrlDomain;
-    @Value("${PROTOCOL}")
-    private String protocol;
+    private final AppConfig appConfig;
 
     // Constructor for dependency injection of UrlRepository
     @Autowired
-    public UrlService(UrlRepository UrlRepository) {
+    public UrlService(UrlRepository UrlRepository, AppConfig appConfig) {
         this.urlRepository = UrlRepository;
+        this.appConfig = appConfig;
     }
 
     /**
@@ -37,46 +33,44 @@ public class UrlService {
      * @return The generated or existing short URL.
      */
     public String createAndSaveShortUrl(String longUrl) {
-        String path = UrlPathExtractor.extractPath(longUrl);
 
         // Check if a short URL already exists for the given path
-        Optional<Url> existingUrl = urlRepository.findByPath(path);
+        Optional<UrlDto> existingUrl = urlRepository.findByLongUrl(longUrl);
         if (existingUrl.isPresent()) {
             String shortCode = existingUrl.get().getShortCode();
-            String shortUrl = createUrl(shortUrlDomain, shortCode);
-            log.info("Existing short URL found for: {}, returning existing shortUrl: {}", longUrl, shortUrl);
-
+            String shortUrl = createShortUrl(shortCode);
+            log.debug("Existing short code found for: {}, returning existing shortUrl: {}", longUrl, shortUrl);
             return shortUrl;
         }
 
         // Generate a new short URL
         String randomCode = generateRandomCode();
-        Url url = new Url(path, "/" + randomCode);
-        urlRepository.save(url);
+
+        UrlDto urlDto = new UrlDto(longUrl, randomCode);
+        urlRepository.save(urlDto);
         log.debug("Generated new shortCode: {} for URL: {}", randomCode, longUrl);
-        return createUrl(shortUrlDomain, url.getShortCode());
+        return createShortUrl(urlDto.getShortCode());
 
     }
 
     /**
      * Retrieves the long URL associated with a given short code.
      *
-     * @param shortCode The short code to look up.
+     * @param shortUrl The short code to look up.
      * @return The long URL associated with the short code.
      * @throws UrlNotFoundException if the short code does not exist.
      */
-    public String getLongUrl(String shortCode) {
+    public String getLongUrl(String shortUrl) {
 
-        Optional<Url> existingUrl = urlRepository.findByShortCode(shortCode);
+        Optional<UrlDto> existingUrl = urlRepository.findByShortCode(shortUrl);
         if (existingUrl.isEmpty()) {
-            throw new UrlNotFoundException("URL not found", shortCode);
+            throw new UrlNotFoundException("URL not found", shortUrl);
         }
-        Url url = existingUrl.get();
-        url.incrementAccessCount(); // Update the access count
-        urlRepository.save(url);
-        String longUrl = createUrl(longUrlDomain, url.getPath());
-        log.info("long url found for: {}, long url: {}", shortCode, longUrl);
-        return longUrl;
+        UrlDto urlDto = existingUrl.get();
+        urlDto.incrementAccessCount(); // Update the access count
+        urlRepository.save(urlDto);
+        log.debug("long url found for: {}, long url: {}", shortUrl, urlDto.getLongUrl());
+        return urlDto.getLongUrl();
     }
 
     /**
@@ -91,13 +85,12 @@ public class UrlService {
     }
 
     /**
-     * Constructs a complete URL from a domain and path.
+     * Creates a short URL from a given short code with the service URL.
      *
-     * @param domain The domain of the URL.
-     * @param path The path of the URL.
-     * @return The complete URL.
+     * @param shortCode The short code to be converted to a short URL.
+     * @return The short URL.
      */
-    private String createUrl(String domain, String path) {
-        return protocol + "://" + domain + path;
+    private String createShortUrl(String shortCode) {
+        return appConfig.getServiceUrl() + "/" + shortCode;
     }
 }
