@@ -1,4 +1,4 @@
-package com.github.melihemreguler.urlshortener.model;
+package com.github.melihemreguler.urlshortener.dto;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -8,22 +8,21 @@ import java.time.LocalDateTime;
 
 @Document(collection = "urls")
 @Data
-public class Url {
+public class UrlDto {
 
     @Indexed(unique = true)
     private String id;
 
-    private String path;
+    private String longUrl;
     private String shortCode;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private int accessCount;
 
-    public Url(String path, String shortCode) {
-        this.path = path;
+    public UrlDto(String longUrl, String shortCode) {
+        this.longUrl = longUrl;
         this.shortCode = shortCode;
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.accessCount = 0;
     }
 
