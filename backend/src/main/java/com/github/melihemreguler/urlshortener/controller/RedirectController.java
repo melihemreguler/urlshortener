@@ -21,19 +21,18 @@ public class RedirectController {
     }
 
     /**
-     * Redirects the user from a short URL to the original long URL.
+     * Redirects the user from a short code to the original long URL.
      *
-     * @param shortUrl The short URL to be resolved to the long URL.
+     * @param shortCode The short code to be resolved to the long URL.
      * @return A RedirectView to the original long URL.
      */
-    @GetMapping("/{shortUrl}")
-    public RedirectView redirectToLongUrl(@PathVariable String shortUrl) {
-        log.info("Received request to redirect short code: {}", shortUrl);
+    @GetMapping("/{shortCode}")
+    public RedirectView redirectToLongUrl(@PathVariable String shortCode) {
+        log.info("Received request to redirect short code: {}", shortCode);
 
         // Fetches the corresponding long URL for the provided short URL
-        String longUrl = urlService.getLongUrl("/" + shortUrl);
-        log.info("Redirecting to long URL for short URL: {}, long URL: {}", shortUrl, longUrl);
-
+        String longUrl = urlService.getLongUrl(shortCode);
+        log.info("Redirecting to long URL for short code: {}, long URL: {}", shortCode, longUrl);
         RedirectView redirectView = new RedirectView();
         redirectView.setUrl(longUrl);
         return redirectView;
