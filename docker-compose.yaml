@@ -6,8 +6,8 @@ services:
       - "27017:27017"
     command: --quiet
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
     volumes:
       - mongodb_data:/data/db
   app:
@@ -19,11 +19,6 @@ services:
       - "8080:8080"
     depends_on:
       - mongodb
-    environment:
-      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_URI}
-      SHORT_URL_DOMAIN: ${SHORT_URL_DOMAIN}
-      LONG_URL_DOMAIN: ${LONG_URL_DOMAIN}
-      PROTOCOL: ${PROTOCOL}
 
 volumes:
   mongodb_data:
