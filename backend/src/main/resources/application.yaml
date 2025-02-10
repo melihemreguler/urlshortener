@@ -1,10 +1,16 @@
 spring:
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
+      uri: "mongodb://admin:secret@localhost:27017/urlshortenerdb?authSource=admin"
 server:
   port: 8080
 logging:
   level:
     root: INFO
     com.github.melihemreguler: DEBUG
+springdoc:
+  swagger-ui:
+    url: "/v3/api-docs"
+service:
+  config:
+    serviceUrl: "http://localhost:8080"
