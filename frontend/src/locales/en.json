@@ -16,5 +16,7 @@
   "url_already_exists": "This URL is already in the list.",
   "error_occurred": "An error occurred. Please try again.",
   "url_deleted": "URL deleted successfully",
-  "undo": "Undo"
+  "undo": "Undo",
+  "api_docs": "API Docs",
+  "api_docs_tooltip": "View Swagger API Documentation"
 }

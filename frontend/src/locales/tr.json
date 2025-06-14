@@ -16,5 +16,7 @@
   "url_already_exists": "Bu URL zaten listede.",
   "error_occurred": "Bir hata oluştu. Lütfen tekrar deneyin.",
   "url_deleted": "URL başarıyla silindi",
-  "undo": "Geri Al"
+  "undo": "Geri Al",
+  "api_docs": "API Dokümantasyonu",
+  "api_docs_tooltip": "Swagger API Dokümantasyonunu Görüntüle"
 }
