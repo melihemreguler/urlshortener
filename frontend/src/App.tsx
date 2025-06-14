@@ -1,12 +1,14 @@
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
-import { Container, Typography, Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Select, MenuItem, FormControl, InputLabel, CssBaseline, Pagination } from '@mui/material';
+import { Container, Typography, Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Select, MenuItem, FormControl, InputLabel, CssBaseline, Pagination, InputAdornment } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { fetchUrls, createShortUrl, deleteShortUrl } from './api';
+import { fetchUrls, createShortUrl, deleteShortUrl, searchUrls } from './api';
 import type { ShortUrl } from './api';
 import Toast from './Toast';
 import MultiToast, { type ToastData } from './MultiToast';
@@ -22,6 +24,7 @@ function App() {
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [urls, setUrls] = useState<ShortUrl[]>([]);
   const [input, setInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [globalToastOpen, setGlobalToastOpen] = useState(false);
   const [globalToastMessage, setGlobalToastMessage] = useState('');
@@ -36,10 +39,13 @@ function App() {
   // Ref to keep track of current pending deletes for cleanup
   const pendingDeletesRef = useRef<PendingDelete[]>([]);
 
-  // Load URLs with pagination
-  const loadUrls = async (page = currentPage) => {
+  // Load URLs with pagination and search
+  const loadUrls = async (page = currentPage, search = searchTerm) => {
     try {
-      const response = await fetchUrls(page - 1, pageSize); // API uses 0-based page
+      const response = search && search.trim() 
+        ? await searchUrls(search, page - 1, pageSize)
+        : await fetchUrls(page - 1, pageSize);
+      
       console.log('Pagination response:', response);
       console.log('Total pages:', response.totalPages, 'Current page:', page);
       
@@ -57,6 +63,16 @@ function App() {
   useEffect(() => {
     loadUrls();
   }, [currentPage]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page on search
+      loadUrls(1, searchTerm);
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   // Keep ref updated with current pending deletes
   useEffect(() => {
@@ -80,6 +96,14 @@ function App() {
   const filteredUrls = urls.filter(url => 
     !pendingDeletes.some(pending => pending.url.id === url.id)
   );
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+  };
 
   const handleThemeToggle = () => {
     setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'));
@@ -247,6 +271,35 @@ function App() {
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
             {t('title')}
           </Typography>
+          
+          {/* Search Box */}
+          <Box sx={{ width: '100%' }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label={t('search_placeholder')}
+              value={searchTerm}
+              onChange={handleSearchChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleSearchClear} size="small">
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              placeholder={t('search_hint')}
+              sx={{ mb: 2 }}
+            />
+          </Box>
+          
+          {/* URL Creation Form */}
           <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
             <TextField
               fullWidth
@@ -281,7 +334,7 @@ function App() {
                     <TableRow>
                       <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
                         <Typography variant="body1" color="text.secondary">
-                          {t('no_urls')}
+                          {searchTerm ? t('no_search_results') : t('no_urls')}
                         </Typography>
                       </TableCell>
                     </TableRow>

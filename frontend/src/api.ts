@@ -43,6 +43,39 @@ export async function fetchUrls(page = 0, size = 10): Promise<PageResponse<Short
   };
 }
 
+export async function searchUrls(searchTerm: string, page = 0, size = 10): Promise<PageResponse<ShortUrl>> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    size: size.toString()
+  });
+  
+  if (searchTerm && searchTerm.trim()) {
+    params.append('q', searchTerm.trim());
+  }
+  
+  const res = await fetch(`${API_BASE_URL}/api/url/search?${params}`);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  const data = await res.json();
+  
+  return {
+    content: data.content.map((item: any) => ({
+      id: item.id,
+      originalUrl: item.longUrl,
+      shortUrl: item.shortCode
+        ? `${API_BASE_URL}/${item.shortCode}`
+        : '',
+    })),
+    page: data.page,
+    size: data.size,
+    totalElements: data.totalElements,
+    totalPages: data.totalPages,
+    first: data.first,
+    last: data.last
+  };
+}
+
 export async function createShortUrl(originalUrl: string) {
   const trimmedUrl = originalUrl.trim();
   const res = await fetch(`${API_BASE_URL}/api/url`, {
