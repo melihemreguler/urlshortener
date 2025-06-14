@@ -38,7 +38,13 @@ export default function MultiToast({ toasts, onClose }: MultiToastProps) {
                     e.stopPropagation();
                     toast.onUndo?.();
                   }}
-                  sx={{ color: 'white' }}
+                  sx={{ 
+                    color: 'inherit',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                    }
+                  }}
                 >
                   {toast.undoText}
                 </Button>
