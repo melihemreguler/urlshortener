@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://admin:secret@localhost:27017/urlshortenerdb_test?authSource=admin"
+logging:
+  level:
+    root: WARN
+    com.github.melihemreguler: DEBUG
+    org.springframework.data.mongodb: DEBUG
+service:
+  config:
+    serviceUrl: "http://localhost:8080"
