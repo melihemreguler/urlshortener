@@ -31,9 +31,6 @@ export const useUrlManagement = () => {
         ? await searchUrls(search, page - 1, pageSize)
         : await fetchUrls(page - 1, pageSize);
       
-      console.log('Pagination response:', response);
-      console.log('Total pages:', response.totalPages, 'Current page:', page);
-      
       setUrls(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -182,10 +179,11 @@ export const useUrlManagement = () => {
   };
 
   const handleUndoDelete = (urlId: string) => {
-    console.log('Undo delete called for:', urlId);
-    const pendingItem = pendingDeletes.find(item => item.url.id === urlId);
+    // Use the ref to get current state, avoiding closure issues
+    const currentPendingDeletes = pendingDeletesRef.current;
+    const pendingItem = currentPendingDeletes.find(item => item.url.id === urlId);
+    
     if (pendingItem) {
-      console.log('Found pending item, clearing timeout');
       clearTimeout(pendingItem.timeoutId);
       
       // Remove from pending deletes
@@ -196,8 +194,6 @@ export const useUrlManagement = () => {
       
       // Reload URLs to ensure the deleted URL is shown again
       loadUrls();
-    } else {
-      console.log('Pending item not found for:', urlId);
     }
   };
 
