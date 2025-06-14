@@ -8,4 +8,13 @@ public record UrlRequest(
         @NotBlank(message = "Long URL cannot be empty")
         String longUrl
 ) {
+    public UrlRequest {
+        if (longUrl != null) {
+            longUrl = longUrl.trim();
+        }
+    }
+    
+    public String getTrimmedLongUrl() {
+        return longUrl != null ? longUrl.trim() : null;
+    }
 }
