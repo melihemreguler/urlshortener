@@ -2,7 +2,37 @@
 
 A full-stack URL shortener application built with Java Spring Boot (backend) and React TypeScript (frontend). The service allows users to shorten long URLs, manage them with a modern web interface, and provides comprehensive search and deletion capabilities.
 
-## ✨ Features
+## Table of Contents
+
+- [Features](#features)
+  - [Backend (Spring Boot)](#backend-spring-boot)
+  - [Frontend (React + TypeScript)](#frontend-react--typescript)
+  - [Infrastructure](#infrastructure)
+- [Technologies Used](#technologies-used)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Infrastructure](#infrastructure-1)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+  - [Using Docker Compose (Recommended)](#using-docker-compose-recommended)
+  - [Local Development](#local-development)
+- [API Documentation](#api-documentation)
+  - [Core Endpoints](#core-endpoints)
+  - [Interactive Documentation](#interactive-documentation)
+- [Database Schema](#database-schema)
+- [Testing](#testing)
+  - [Backend Tests](#backend-tests)
+  - [Frontend Tests](#frontend-tests)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Development vs Production](#development-vs-production)
+- [Error Handling](#error-handling)
+- [Internationalization](#internationalization)
+- [Architecture](#architecture)
+- [Performance Features](#performance-features)
+- [Future Enhancements](#future-enhancements)
+
+## Features
 
 ### Backend (Spring Boot)
 - **URL Shortening**: Generate short URLs for given long URLs with duplicate detection
@@ -32,7 +62,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 - **Environment Configuration**: Flexible configuration for different environments
 - **CORS Support**: Properly configured cross-origin resource sharing
 
-## 🛠 Technologies Used
+## Technologies Used
 
 ### Backend
 - **Java 17** - Programming language
@@ -56,14 +86,14 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 - **MongoDB 6.0.20** - Document database
 - **Nginx** - Frontend web server (in production container)
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Docker** and **Docker Compose** installed on your system
 - **Git** for cloning the repository
 - **Java 17+** and **Maven** (for local development)
 - **Node.js 18+** and **npm** (for frontend development)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Using Docker Compose (Recommended)
 
@@ -100,7 +130,7 @@ npm install
 npm run dev
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 ### Core Endpoints
 
@@ -162,7 +192,7 @@ npm run dev
 - **Swagger UI**: http://localhost:8080/swagger-ui/index.html
 - **OpenAPI Specs**: http://localhost:8080/v3/api-docs
 
-## 🗄 Database Schema
+## Database Schema
 
 The application uses MongoDB with the following document structure:
 
@@ -177,7 +207,7 @@ The application uses MongoDB with the following document structure:
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Backend Tests
 ```bash
@@ -203,7 +233,7 @@ cd frontend
 npm run test  # (when configured)
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -230,7 +260,7 @@ npm run test  # (when configured)
 - Compressed frontend assets
 - Environment-specific configurations
 
-## 🛡 Error Handling
+## Error Handling
 
 The application implements comprehensive error handling:
 
@@ -245,7 +275,7 @@ The application implements comprehensive error handling:
 - Graceful fallbacks for network issues
 - Toast notifications for user feedback
 
-## 🌐 Internationalization
+## Internationalization
 
 The frontend supports multiple languages:
 - **English** (default)
@@ -253,7 +283,7 @@ The frontend supports multiple languages:
 
 Language detection is automatic based on browser settings, with manual switching available.
 
-## 🔄 Architecture
+## Architecture
 
 ### Backend Architecture
 ```
@@ -277,7 +307,7 @@ API Layer (axios/fetch)
 Backend REST API
 ```
 
-## 📊 Performance Features
+## Performance Features
 
 - **Pagination**: Efficient handling of large datasets
 - **Debounced Search**: Optimized search performance
@@ -285,7 +315,7 @@ Backend REST API
 - **Caching**: Browser caching for static assets
 - **Lazy Loading**: On-demand resource loading
 
-## 🚧 Future Enhancements
+## Future Enhancements
 
 - [ ] User authentication and authorization
 - [ ] URL expiration dates
