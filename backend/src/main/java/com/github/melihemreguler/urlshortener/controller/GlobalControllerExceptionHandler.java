@@ -4,21 +4,21 @@ import com.github.melihemreguler.urlshortener.exception.UrlNotFoundException;
 import com.github.melihemreguler.urlshortener.model.ErrorResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Hidden
@@ -37,16 +37,58 @@ public class GlobalControllerExceptionHandler {
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.warn("Validation error: {}", ex.getBindingResult().getAllErrors());
 
-        Map<String, String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        DefaultMessageSourceResolvable::getDefaultMessage
-                ));
+        Map<String, String> errors = new HashMap<>();
+        
+        // Collect field errors, handling duplicates by taking the first error message
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            String fieldName = fieldError.getField();
+            if (!errors.containsKey(fieldName)) {
+                errors.put(fieldName, fieldError.getDefaultMessage());
+            }
+        }
 
         errors.put("error", "Validation failed");
         return errors;
+    }
+
+    /**
+     * Handles JSON parse errors (malformed JSON).
+     *
+     * @param ex The exception containing details about the JSON parsing error.
+     * @param request The HTTP request.
+     * @return A JSON response indicating the malformed JSON error.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        log.warn("JSON parse error: {}", ex.getMessage());
+        return ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                "Invalid JSON format",
+                request.getRequestURI()
+        );
+    }
+
+    /**
+     * Handles method argument type mismatch errors (e.g., invalid parameter types).
+     *
+     * @param ex The exception containing details about the type mismatch.
+     * @param request The HTTP request.
+     * @return A JSON response indicating the parameter type error.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        log.warn("Parameter type mismatch: {} for parameter '{}'", ex.getValue(), ex.getName());
+        return ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                String.format("Invalid value '%s' for parameter '%s'", ex.getValue(), ex.getName()),
+                request.getRequestURI()
+        );
     }
 
     /**
