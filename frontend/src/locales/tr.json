@@ -1,0 +1,17 @@
+{
+  "title": "URL Kısaltıcı",
+  "create": "Kısa URL Oluştur",
+  "url_placeholder": "Bir URL girin...",
+  "short_url": "Kısa URL",
+  "original_url": "Orijinal URL",
+  "actions": "İşlemler",
+  "delete": "Sil",
+  "no_urls": "Henüz kısa URL yok.",
+  "theme": "Tema",
+  "light": "Açık",
+  "dark": "Koyu",
+  "url_already_exists": "Bu URL zaten listede.",
+  "error_occurred": "Bir hata oluştu. Lütfen tekrar deneyin.",
+  "url_deleted": "URL başarıyla silindi",
+  "undo": "Geri Al"
+}

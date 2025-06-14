@@ -1,0 +1,17 @@
+{
+  "title": "URL Shortener",
+  "create": "Create Short URL",
+  "url_placeholder": "Enter a URL...",
+  "short_url": "Short URL",
+  "original_url": "Original URL",
+  "actions": "Actions",
+  "delete": "Delete",
+  "no_urls": "No short URLs yet.",
+  "theme": "Theme",
+  "light": "Light",
+  "dark": "Dark",
+  "url_already_exists": "This URL is already in the list.",
+  "error_occurred": "An error occurred. Please try again.",
+  "url_deleted": "URL deleted successfully",
+  "undo": "Undo"
+}
