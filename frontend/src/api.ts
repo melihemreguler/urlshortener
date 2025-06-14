@@ -1,10 +1,9 @@
 // src/api.ts
 import type { PageResponse, ShortUrl } from './types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API_ENDPOINTS, buildShortUrl } from './config/api';
 
 export async function fetchUrls(page = 0, size = 10): Promise<PageResponse<ShortUrl>> {
-  const res = await fetch(`${API_BASE_URL}/api/url?page=${page}&size=${size}`);
+  const res = await fetch(`${API_ENDPOINTS.URLS}?page=${page}&size=${size}`);
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
@@ -15,7 +14,7 @@ export async function fetchUrls(page = 0, size = 10): Promise<PageResponse<Short
       id: item.id,
       originalUrl: item.longUrl,
       shortUrl: item.shortCode
-        ? `${API_BASE_URL}/${item.shortCode}`
+        ? buildShortUrl(item.shortCode)
         : '',
     })),
     page: data.page,
@@ -37,7 +36,7 @@ export async function searchUrls(searchTerm: string, page = 0, size = 10): Promi
     params.append('q', searchTerm.trim());
   }
   
-  const res = await fetch(`${API_BASE_URL}/api/url/search?${params}`);
+  const res = await fetch(`${API_ENDPOINTS.SEARCH}?${params}`);
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
@@ -48,7 +47,7 @@ export async function searchUrls(searchTerm: string, page = 0, size = 10): Promi
       id: item.id,
       originalUrl: item.longUrl,
       shortUrl: item.shortCode
-        ? `${API_BASE_URL}/${item.shortCode}`
+        ? buildShortUrl(item.shortCode)
         : '',
     })),
     page: data.page,
@@ -62,7 +61,7 @@ export async function searchUrls(searchTerm: string, page = 0, size = 10): Promi
 
 export async function createShortUrl(originalUrl: string) {
   const trimmedUrl = originalUrl.trim();
-  const res = await fetch(`${API_BASE_URL}/api/url`, {
+  const res = await fetch(API_ENDPOINTS.URLS, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ longUrl: trimmedUrl }),
@@ -85,7 +84,7 @@ export async function createShortUrl(originalUrl: string) {
 }
 
 export async function deleteShortUrl(id: string) {
-  const res = await fetch(`${API_BASE_URL}/api/url/${id}`, { method: 'DELETE' });
+  const res = await fetch(API_ENDPOINTS.DELETE_URL(id), { method: 'DELETE' });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.message || `HTTP ${res.status}: ${res.statusText}`);
