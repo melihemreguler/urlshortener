@@ -142,4 +142,32 @@ public class UrlService {
     public void deleteShortUrl(String id) {
         urlRepository.deleteById(id);
     }
+
+    /**
+     * Searches URLs by search term in both longUrl and shortCode fields.
+     * @param searchTerm The search term to look for
+     * @param page The page number (0-based)
+     * @param size The number of items per page
+     * @return PageResponse containing matching UrlDto list
+     */
+    public PageResponse<UrlDto> searchUrls(String searchTerm, int page, int size) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            // If search term is empty, return all URLs
+            return getAllShortUrls(page, size);
+        }
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<UrlDto> urlPage = urlRepository.findByLongUrlContainingIgnoreCaseOrShortCodeContainingIgnoreCase(
+            searchTerm.trim(), pageable);
+        
+        return new PageResponse<>(
+            urlPage.getContent(),
+            urlPage.getNumber(),
+            urlPage.getSize(),
+            urlPage.getTotalElements(),
+            urlPage.getTotalPages(),
+            urlPage.isFirst(),
+            urlPage.isLast()
+        );
+    }
 }

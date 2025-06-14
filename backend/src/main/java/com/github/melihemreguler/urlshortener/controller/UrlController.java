@@ -62,6 +62,21 @@ public class UrlController {
     }
 
     /**
+     * Searches URLs by term in both longUrl and shortCode fields.
+     * @param q The search query term
+     * @param page The page number (0-based)
+     * @param size The number of items per page
+     * @return Paginated response containing matching UrlDto list
+     */
+    @GetMapping("/search")
+    public PageResponse<UrlDto> searchUrls(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return urlService.searchUrls(q, page, size);
+    }
+
+    /**
      * Deletes a short URL by id.
      * @param id The id of the short URL to delete.
      */
