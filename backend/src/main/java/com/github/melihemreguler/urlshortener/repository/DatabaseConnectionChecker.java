@@ -3,11 +3,11 @@ package com.github.melihemreguler.urlshortener.repository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 @Slf4j
 public class DatabaseConnectionChecker {
 
