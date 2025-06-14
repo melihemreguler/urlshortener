@@ -1,12 +1,5 @@
 import { Box, Alert, Button } from '@mui/material';
-
-interface ToastData {
-  id: string;
-  message: string;
-  severity: 'info' | 'success' | 'warning' | 'error';
-  onUndo?: () => void;
-  undoText?: string;
-}
+import type { ToastData } from './types';
 
 interface MultiToastProps {
   toasts: ToastData[];
