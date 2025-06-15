@@ -14,8 +14,10 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
   - [Infrastructure](#infrastructure-1)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-  - [Using Docker Compose (Recommended)](#using-docker-compose-recommended)
-  - [Local Development](#local-development)
+  - [Local Development (with Docker & Local MongoDB)](#local-development-with-docker--local-mongodb)
+  - [Production Deployment (with MongoDB Atlas)](#production-deployment-with-mongodb-atlas)
+  - [Switching Between Environments](#switching-between-environments)
+- [Local Development](#local-development)
 - [API Documentation](#api-documentation)
   - [Core Endpoints](#core-endpoints)
   - [Interactive Documentation](#interactive-documentation)
@@ -26,6 +28,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 - [Configuration](#configuration)
   - [Environment Variables](#environment-variables)
   - [Development vs Production](#development-vs-production)
+  - [Database Configuration](#database-configuration)
 - [Error Handling](#error-handling)
 - [Internationalization](#internationalization)
 - [Architecture](#architecture)
@@ -95,7 +98,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Local Development (with Docker & Local MongoDB)
 
 1. **Clone the repository:**
    ```bash
@@ -103,16 +106,68 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
    cd urlshortener
    ```
 
-2. **Start all services:**
+2. **Start the application with local MongoDB:**
    ```bash
-   docker-compose up --build
+   docker-compose -f docker-compose.local.yaml --env-file .env.development up --build
    ```
 
 3. **Access the applications:**
    - **Frontend**: http://localhost:3000
    - **Backend API**: http://localhost:8080
    - **API Documentation**: http://localhost:8080/swagger-ui/index.html
-   - **MongoDB**: localhost:27017
+   - **MongoDB**: localhost:27017 (admin/secret)
+
+### Production Deployment (with MongoDB Atlas)
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd urlshortener
+   ```
+
+2. **Configure production environment:**
+   ```bash
+   # Copy environment template
+   cp .env.example .env.production
+   
+   # Edit .env.production with your actual MongoDB Atlas connection string and production URLs
+   nano .env.production
+   ```
+
+   **⚠️ Security Note**: The `.env.production` file contains sensitive database credentials and is already added to `.gitignore`.
+
+3. **Start the application:**
+   ```bash
+   docker-compose --env-file .env.production up --build
+   ```
+
+4. **Access the applications:**
+   - **Frontend**: http://localhost:3000
+   - **Backend API**: http://localhost:8080
+   - **API Documentation**: http://localhost:8080/swagger-ui/index.html
+
+### Switching Between Environments
+
+When switching from production to development (or vice versa), you may need to clean up Docker networks:
+
+1. **Check existing networks:**
+   ```bash
+   docker network ls --filter "name=urlshortener"
+   ```
+
+2. **Remove the network if needed:**
+   ```bash
+   docker network rm urlshortener_default
+   ```
+
+3. **Then start with the desired environment:**
+   ```bash
+   # For development
+   docker-compose -f docker-compose.local.yaml --env-file .env.development up --build
+   
+   # For production
+   docker-compose --env-file .env.production up --build
+   ```
 
 ### Local Development
 
@@ -237,28 +292,70 @@ npm run test  # (when configured)
 
 ### Environment Variables
 
-#### Backend Configuration
-- `SPRING_PROFILES_ACTIVE`: Set to `production` or `test`
-- `SPRING_DATA_MONGODB_URI`: MongoDB connection string
-- `SERVICE_CONFIG_SERVICEURL`: Base URL for short URL generation
+The application uses environment files for configuration:
 
-#### Frontend Configuration
-- `VITE_API_URL`: Backend API base URL (default: http://localhost:8080)
+#### Production Environment (`.env.production`)
+```bash
+# MongoDB Atlas connection string
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/urlshortenerdb
+
+# Service URL for generating short URLs (your production domain)
+SERVICE_URL=https://your-production-domain.com
+
+# Spring profile
+SPRING_PROFILES_ACTIVE=production
+```
+
+#### Development Environment (`.env.development`)
+```bash
+# Local MongoDB connection (for Docker Compose)
+MONGODB_URI=mongodb://admin:secret@mongodb:27017/urlshortenerdb?authSource=admin
+
+# Service URL for development
+SERVICE_URL=http://localhost:8080
+
+# Spring profile
+SPRING_PROFILES_ACTIVE=development
+```
+
+#### Frontend Configuration (`frontend/.env`)
+```bash
+# Backend API URL
+VITE_API_URL=http://localhost:8080
+```
 
 ### Development vs Production
 
-#### Development (docker-compose.yml)
-- Uses local MongoDB instance
-- Hot reload enabled for frontend
-- Debug logging enabled
-- API accessible at localhost:8080
-- Frontend dev server at localhost:3000
+#### Development Setup
+- **MongoDB**: Local containerized instance (docker-compose.local.yaml)
+- **Configuration**: Uses `.env.development`
+- **Frontend**: Development server with hot reload
+- **Database**: `mongodb://admin:secret@mongodb:27017/urlshortenerdb?authSource=admin`
 
-#### Production Configuration
-- Optimized Docker images
-- Production-ready MongoDB setup
-- Compressed frontend assets
-- Environment-specific configurations
+#### Production Setup
+- **MongoDB**: MongoDB Atlas cloud database
+- **Configuration**: Uses `.env.production`
+- **Frontend**: Optimized build served by nginx
+- **Database**: MongoDB Atlas connection string
+
+### Database Configuration
+
+#### For MongoDB Atlas (Production)
+1. Create a MongoDB Atlas cluster
+2. Get your connection string from Atlas dashboard
+3. Add it to `.env.production` as `MONGODB_URI`
+
+#### For Local Development
+1. Use `docker-compose.local.yaml` to start MongoDB container
+2. MongoDB will be available at `mongodb://admin:secret@mongodb:27017`
+
+```bash
+# Start local development with MongoDB
+docker-compose -f docker-compose.local.yaml up --build
+
+# Start production deployment (requires .env.production)
+docker-compose up --build
+```
 
 ## Error Handling
 
