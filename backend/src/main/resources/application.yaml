@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: "mongodb://admin:secret@mongodb:27017/urlshortenerdb?authSource=admin"
+      uri: ${MONGODB_URI:mongodb://admin:secret@mongodb:27017/urlshortenerdb?authSource=admin}
   mvc:
     throw-exception-if-no-handler-found: true
   web:
@@ -27,7 +27,7 @@ springdoc:
     url: "/v3/api-docs"
 service:
   config:
-    serviceUrl: "http://localhost:8080"
+    serviceUrl: ${SERVICE_URL:http://localhost:8080}
 cors:
   allowed:
     origins:
