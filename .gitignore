@@ -1,5 +1,10 @@
 .DS_Store
-app.env
 .idea/.vscode/
 .idea/
 .vscode/
+
+# Environment files with sensitive data
+.env.production
+
+# Docker volumes
+mongodb_data/
