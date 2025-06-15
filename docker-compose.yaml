@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: melihemreguler/urlshortener-backend:latest
     container_name: urlshortener
     ports:
       - "${BACKEND_PORT:-8080}:8080"
@@ -15,11 +13,7 @@ services:
     networks:
       - web
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=${VITE_API_URL}
+    image: melihemreguler/urlshortener-frontend:latest
     container_name: urlshortener-frontend
     ports:
       - "${FRONTEND_PORT:-3000}:80"
