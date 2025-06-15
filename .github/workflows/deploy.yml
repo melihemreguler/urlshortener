@@ -71,6 +71,13 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          # Check if project directory exists
+          if [ ! -d "/home/ubuntu/urlshortener" ]; then
+            echo "Project directory not found. Cloning repository..."
+            cd /home/ubuntu
+            git clone https://github.com/melihemreguler/urlshortener.git
+          fi
+          
           # Navigate to project directory
           cd /home/ubuntu/urlshortener
 
@@ -96,23 +103,41 @@ jobs:
           fi
 
           # Create .env.production file with secrets
-          cat > .env.production << EOL
-          MONGODB_URI=${{ secrets.MONGODB_URI }}
-          SERVICE_URL=${{ secrets.SERVICE_URL }}
-          SPRING_PROFILES_ACTIVE=production
-          VITE_API_URL=${{ secrets.VITE_API_URL }}
-          BACKEND_PORT=8080
-          FRONTEND_PORT=3000
-          LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
-        EOL
+          echo "Creating .env.production file..."
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" > .env.production
+          echo "SERVICE_URL=${{ secrets.SERVICE_URL }}" >> .env.production
+          echo "SPRING_PROFILES_ACTIVE=production" >> .env.production
+          echo "VITE_API_URL=https://urlshortener.melihemre.dev/api" >> .env.production
+          echo "BACKEND_PORT=8080" >> .env.production
+          echo "FRONTEND_PORT=3000" >> .env.production
+          echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env.production
+
+          # Verify .env.production was created
+          echo "Verifying .env.production file..."
+          if [ ! -f .env.production ]; then
+            echo "ERROR: Failed to create .env.production file"
+            exit 1
+          fi
+          
+          echo "Content of .env.production:"
+          cat .env.production
+          echo ""
+
+          # Check if Docker Compose file exists
+          if [ ! -f docker-compose.yaml ]; then
+            echo "ERROR: docker-compose.yaml not found"
+            exit 1
+          fi
 
           # Stop only urlshortener app containers (preserve nginx-proxy and others)
           echo "Stopping urlshortener app containers..."
-          docker compose down --remove-orphans || true
+          docker compose -f docker-compose.yaml down --remove-orphans || true
           
-          # Remove old urlshortener app images to free space
+          # Remove old urlshortener app images and build cache to free space
+          echo "Cleaning up old images and build cache..."
           docker rmi melihemreguler/urlshortener-backend:latest 2>/dev/null || true
           docker rmi melihemreguler/urlshortener-frontend:latest 2>/dev/null || true
+          docker builder prune -f || true
 
           # Pull latest images (one at a time to manage disk space)
           echo "Pulling backend image..."
@@ -121,9 +146,21 @@ jobs:
           echo "Pulling frontend image..."
           docker pull melihemreguler/urlshortener-frontend:latest
 
-          # Start new containers
-          echo "Starting new containers..."
-          docker compose --env-file .env.production up -d
+          # Start new containers with explicit --no-build flag
+          echo "Starting new containers with --no-build flag..."
+          docker compose -f docker-compose.yaml --env-file .env.production up -d --no-build
+          
+          # Show what containers are running
+          echo "Running containers after start:"
+          docker compose -f docker-compose.yaml ps
+          
+          # Check if containers started successfully
+          echo "Checking container status..."
+          if ! docker compose -f docker-compose.yaml ps --services --filter "status=running" | grep -q .; then
+            echo "ERROR: Some containers failed to start"
+            docker compose -f docker-compose.yaml logs
+            exit 1
+          fi
 
           # Wait for containers to be ready
           sleep 30
