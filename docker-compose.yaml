@@ -12,6 +12,8 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - SERVICE_URL=${SERVICE_URL}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    networks:
+      - web
   frontend:
     build:
       context: ./frontend
@@ -27,3 +29,12 @@ services:
       - .env.production
     environment:
       - VITE_API_URL=${VITE_API_URL}
+      - VIRTUAL_HOST=urlshortener.melihemre.dev
+      - LETSENCRYPT_HOST=urlshortener.melihemre.dev
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-guler@melihemre.dev}
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
