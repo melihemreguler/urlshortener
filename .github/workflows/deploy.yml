@@ -102,17 +102,15 @@ jobs:
             exit 1
           fi
 
-          # Create .env.production file with secrets using cat with EOF
+          # Create .env.production file with secrets
           echo "Creating .env.production file..."
-          cat > .env.production << 'EOL'
-MONGODB_URI=${{ secrets.MONGODB_URI }}
-SERVICE_URL=${{ secrets.SERVICE_URL }}
-SPRING_PROFILES_ACTIVE=production
-VITE_API_URL=https://urlshortener.melihemre.dev/api
-BACKEND_PORT=8080
-FRONTEND_PORT=3000
-LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
-EOL
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" > .env.production
+          echo "SERVICE_URL=${{ secrets.SERVICE_URL }}" >> .env.production
+          echo "SPRING_PROFILES_ACTIVE=production" >> .env.production
+          echo "VITE_API_URL=https://urlshortener.melihemre.dev/api" >> .env.production
+          echo "BACKEND_PORT=8080" >> .env.production
+          echo "FRONTEND_PORT=3000" >> .env.production
+          echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env.production
 
           # Verify .env.production was created
           echo "Verifying .env.production file..."
@@ -150,7 +148,7 @@ EOL
 
           # Start new containers with explicit --no-build flag
           echo "Starting new containers with --no-build flag..."
-          docker compose -f docker-compose.yaml --env-file .env.production up -d --no-build
+          docker compose -f docker-compose.yaml up -d --no-build
           
           # Show what containers are running
           echo "Running containers after start:"
