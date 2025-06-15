@@ -145,6 +145,49 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
    - Domain configured: `urlshortener.melihemre.dev`
    - nginx-proxy running on the server with `web` network
    - DNS A records pointing to your server IP
+   - Project repository cloned on EC2: `/home/ubuntu/urlshortener`
+
+   ** First-time EC2 Setup:**
+   ```bash
+   # On your EC2 server
+   cd /home/ubuntu
+   git clone https://github.com/YOUR_USERNAME/urlshortener.git
+   cd urlshortener
+   ```
+
+### Automated Deployment (GitHub Actions)
+
+The project includes automated CI/CD pipeline that:
+- Builds Docker images on every push to `main` branch
+- Pushes images to Docker Hub
+- Deploys to EC2 server automatically
+
+**🔧 Setup GitHub Secrets:**
+
+Navigate to your GitHub repository → Settings → Secrets and variables → Actions, and add:
+
+```bash
+# Docker Hub
+DOCKER_HUB_USERNAME=your_dockerhub_username
+DOCKER_HUB_ACCESS_TOKEN=your_dockerhub_access_token
+
+# EC2 Deployment
+EC2_HOST=your_server_ip_or_domain
+EC2_USER=ubuntu
+EC2_SSH_KEY=your_private_ssh_key_content
+
+# Application Environment
+MONGODB_URI=your_mongodb_atlas_connection_string
+SERVICE_URL=https://urlshortener.melihemre.dev
+VITE_API_URL=https://urlshortener.melihemre.dev
+LETSENCRYPT_EMAIL=your_email@domain.com
+```
+
+** Deployment Process:**
+1. Push code to `main` branch
+2. GitHub Actions automatically builds and pushes Docker images
+3. Connects to EC2 and updates the application
+4. Runs health checks to verify deployment
 
 4. **Access the applications:**
    - **Frontend**: https://urlshortener.melihemre.dev
