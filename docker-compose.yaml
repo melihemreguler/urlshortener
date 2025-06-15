@@ -1,35 +1,29 @@
 services:
-  mongodb:
-    image: mongo:6.0.20
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    command: --quiet
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
-    volumes:
-      - mongodb_data:/data/db
   app:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: urlshortener
     ports:
-      - "8080:8080"
-    depends_on:
-      - mongodb
+      - "${BACKEND_PORT:-8080}:8080"
+    env_file:
+      - .env.production
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - SERVICE_URL=${SERVICE_URL}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     container_name: urlshortener-frontend
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       - app
+    env_file:
+      - .env.production
     environment:
-      - VITE_API_URL=http://app:8080
-
-volumes:
-  mongodb_data:
+      - VITE_API_URL=${VITE_API_URL}

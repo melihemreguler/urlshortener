@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:6.0.20
+    container_name: mongodb
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    command: --quiet
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-secret}
+    volumes:
+      - mongodb_data:/data/db
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: urlshortener
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      - mongodb
+    env_file:
+      - .env.development
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: urlshortener-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - app
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+
+volumes:
+  mongodb_data:
