@@ -34,6 +34,7 @@ cors:
       - "http://localhost:3000"
       - "http://localhost:5173"
       - "http://urlshortener-frontend:3000"
+      - "https://urlshortener.melihemre.dev"
     methods:
       - "GET"
       - "POST"

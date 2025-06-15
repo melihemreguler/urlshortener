@@ -141,10 +141,15 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
    docker-compose --env-file .env.production up --build
    ```
 
+   **📋 Prerequisites for Production:**
+   - Domain configured: `urlshortener.melihemre.dev`
+   - nginx-proxy running on the server with `web` network
+   - DNS A records pointing to your server IP
+
 4. **Access the applications:**
-   - **Frontend**: http://localhost:3000
-   - **Backend API**: http://localhost:8080
-   - **API Documentation**: http://localhost:8080/swagger-ui/index.html
+   - **Frontend**: https://urlshortener.melihemre.dev
+   - **Backend API**: https://urlshortener.melihemre.dev/api
+   - **API Documentation**: https://urlshortener.melihemre.dev/api/swagger-ui/index.html
 
 ### Switching Between Environments
 
