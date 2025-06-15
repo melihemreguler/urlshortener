@@ -1,0 +1,140 @@
+name: Build and Deploy URL Shortener
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Build and Push Backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          melihemreguler/urlshortener-backend:latest
+          melihemreguler/urlshortener-backend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and Push Frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          melihemreguler/urlshortener-frontend:latest
+          melihemreguler/urlshortener-frontend:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Copy Scripts to EC2
+      run: |
+        scp -r scripts/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/
+
+    - name: Deploy to EC2
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          # Navigate to project directory
+          cd /home/ubuntu/urlshortener
+
+          # Update repository
+          git fetch origin
+          git reset --hard origin/main
+          
+          # Run cleanup script
+          echo "Running cleanup script..."
+          chmod +x ~/scripts/cleanup-ec2.sh
+          ~/scripts/cleanup-ec2.sh
+          
+          # Check if we have enough disk space (need at least 2GB free)
+          AVAILABLE_KB=$(df / | tail -1 | awk '{print $4}')
+          AVAILABLE_GB=$((AVAILABLE_KB / 1024 / 1024))
+          echo "Available disk space: ${AVAILABLE_GB}GB"
+          
+          if [ $AVAILABLE_GB -lt 2 ]; then
+            echo "ERROR: Not enough disk space for deployment. Need at least 2GB free."
+            echo "Current usage:"
+            df -h /
+            exit 1
+          fi
+
+          # Create .env.production file with secrets
+          cat > .env.production << EOL
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          SERVICE_URL=${{ secrets.SERVICE_URL }}
+          SPRING_PROFILES_ACTIVE=production
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+          BACKEND_PORT=8080
+          FRONTEND_PORT=3000
+          LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+        EOL
+
+          # Stop only urlshortener app containers (preserve nginx-proxy and others)
+          echo "Stopping urlshortener app containers..."
+          docker compose down --remove-orphans || true
+          
+          # Remove old urlshortener app images to free space
+          docker rmi melihemreguler/urlshortener-backend:latest 2>/dev/null || true
+          docker rmi melihemreguler/urlshortener-frontend:latest 2>/dev/null || true
+
+          # Pull latest images (one at a time to manage disk space)
+          echo "Pulling backend image..."
+          docker pull melihemreguler/urlshortener-backend:latest
+          
+          echo "Pulling frontend image..."
+          docker pull melihemreguler/urlshortener-frontend:latest
+
+          # Start new containers
+          echo "Starting new containers..."
+          docker compose --env-file .env.production up -d
+
+          # Wait for containers to be ready
+          sleep 30
+
+          # Run verification script
+          echo "Running deployment verification..."
+          chmod +x ~/scripts/verify-deployment.sh
+          ~/scripts/verify-deployment.sh
+
+          # Final cleanup of unused images only
+          docker image prune -f
+
+          echo "Deployment complete!"
+        EOF
