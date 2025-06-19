@@ -1,17 +1,9 @@
 #!/bin/bash
 
 # EC2 Deployment Verification Script
-# This script checks the deployment status and commoecho -e "\nTesting URL Shortener API..."
-curl -I https://urlshortener.melihemre.dev/api/ping 2>/dev/null || echo "API connection failed"
+# This script checks the deployment status and common issues
 
-echo -e "\n=== Application Health Check ==="
-echo "Testing API ping endpoint..."
-API_RESPONSE=$(curl -s https://urlshortener.melihemre.dev/api/ping 2>/dev/null)
-if [ "$API_RESPONSE" = "\"pong\"" ]; then
-    echo "API is responding correctly"
-else
-    echo "API is not responding correctly. Response: $API_RESPONSE"
-ficho "=== URL Shortener App Deployment Status ==="
+echo "=== URL Shortener App Deployment Status ==="
 echo "Timestamp: $(date)"
 
 echo -e "\n=== System Information ==="
