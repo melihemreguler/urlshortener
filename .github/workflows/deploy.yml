@@ -129,6 +129,16 @@ jobs:
             exit 1
           fi
 
+          # Export environment variables once for all docker commands
+          echo "Setting up environment variables..."
+          export MONGODB_URI="${{ secrets.MONGODB_URI }}"
+          export SERVICE_URL="${{ secrets.SERVICE_URL }}"
+          export SPRING_PROFILES_ACTIVE="production"
+          export VITE_API_URL="https://urlshortener.melihemre.dev/api"
+          export BACKEND_PORT="8080"
+          export FRONTEND_PORT="3000"
+          export LETSENCRYPT_EMAIL="${{ secrets.LETSENCRYPT_EMAIL }}"
+
           # Stop only urlshortener app containers (preserve nginx-proxy and others)
           echo "Stopping urlshortener app containers..."
           docker compose -f docker-compose.yaml down --remove-orphans || true
@@ -146,8 +156,8 @@ jobs:
           echo "Pulling frontend image..."
           docker pull melihemreguler/urlshortener-frontend:latest
 
-          # Start new containers with explicit --no-build flag
-          echo "Starting new containers with --no-build flag..."
+          # Start new containers
+          echo "Starting new containers..."
           docker compose -f docker-compose.yaml up -d --no-build
           
           # Show what containers are running
