@@ -23,11 +23,11 @@ logging:
     com.github.melihemreguler: DEBUG
 springdoc:
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
-    enabled: true
   api-docs:
-    path: /v3/api-docs
     enabled: true
+    path: /v3/api-docs
 service:
   config:
     serviceUrl: ${SERVICE_URL:http://localhost:8080}
