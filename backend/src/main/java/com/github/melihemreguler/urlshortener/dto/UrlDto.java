@@ -21,6 +21,10 @@ public class UrlDto {
     private LocalDateTime updatedAt;
     private int accessCount;
 
+    public UrlDto() {
+        // Default constructor for MongoDB
+    }
+
     public UrlDto(String longUrl, String shortCode) {
         this.longUrl = longUrl;
         this.shortCode = shortCode;
