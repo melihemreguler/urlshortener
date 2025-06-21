@@ -13,11 +13,11 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Runtime stage - Ultra minimal
+# Runtime stage - Multi-platform Alpine
 FROM alpine:3.19
 WORKDIR /app
 
-# Install only JRE
+# Install OpenJDK 17 JRE
 RUN apk add --no-cache openjdk17-jre
 
 COPY --from=build /app/target/*.jar app.jar

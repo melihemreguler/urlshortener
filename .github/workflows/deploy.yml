@@ -27,7 +27,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./backend
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         push: true
         tags: |
           melihemreguler/urlshortener-backend:latest
@@ -39,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./frontend
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
         push: true
         tags: |
           melihemreguler/urlshortener-frontend:latest
