@@ -1,5 +1,5 @@
 services:
-  app:
+  urlshortener-backend:
     image: melihemreguler/urlshortener-backend:latest
     container_name: urlshortener
     ports:
@@ -16,7 +16,7 @@ services:
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
-      - app
+      - urlshortener-backend
     environment:
       - VITE_API_URL=${VITE_API_URL}
       - VIRTUAL_HOST=urlshortener.melihemre.dev
