@@ -1,13 +1,26 @@
-# Resolve Maven dependencies
-FROM maven:3.8.5-openjdk-17-slim AS dependencies
+# Build stage
+FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:resolve
 
-# Run the application
-FROM maven:3.8.5-openjdk-17-slim
+# Install Maven
+RUN apk add --no-cache maven
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code and build
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage - Ultra minimal
+FROM alpine:3.19
 WORKDIR /app
-COPY --from=dependencies /root/.m2 /root/.m2
-COPY . .
-CMD ["mvn", "spring-boot:run"]
+
+# Install only JRE
+RUN apk add --no-cache openjdk17-jre
+
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]
 
