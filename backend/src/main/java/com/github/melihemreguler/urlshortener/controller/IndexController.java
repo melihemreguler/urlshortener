@@ -13,7 +13,8 @@ public class IndexController {
     public RedirectView redirectToSwagger() {
         log.info("Redirecting to Swagger UI");
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl("/swagger-ui/index.html");
+        redirectView.setUrl("/api/swagger-ui.html");
+        redirectView.setContextRelative(false);
         return redirectView;
     }
 }

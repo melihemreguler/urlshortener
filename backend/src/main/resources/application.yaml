@@ -10,8 +10,6 @@ spring:
     active: production
 server:
   port: 8080
-  servlet:
-    context-path: /api
   error:
     include-stacktrace: never
     include-exception: false
@@ -25,7 +23,7 @@ logging:
     com.github.melihemreguler: DEBUG
 springdoc:
   swagger-ui:
-    path: /swagger-ui/index.html
+    path: /swagger-ui.html
     enabled: true
   api-docs:
     path: /v3/api-docs

@@ -9,6 +9,9 @@ services:
       - MONGODB_DATABASE=${MONGODB_DATABASE:-urlshortenerdb}
       - SERVICE_URL=${SERVICE_URL}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - VIRTUAL_HOST=urlshortener.melihemre.dev
+      - VIRTUAL_PATH=/api
+      - VIRTUAL_PORT=8080
     networks:
       - web
   frontend:
