@@ -70,7 +70,7 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -o ConnectTimeout=30 ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Check if project directory exists
           if [ ! -d "/home/ubuntu/urlshortener" ]; then
             echo "Project directory not found. Cloning repository..."
@@ -151,10 +151,16 @@ jobs:
 
           # Pull latest images (one at a time to manage disk space)
           echo "Pulling backend image..."
-          docker pull melihemreguler/urlshortener-backend:latest
+          timeout 300 docker pull melihemreguler/urlshortener-backend:latest || {
+            echo "Backend image pull failed or timed out, retrying..."
+            timeout 300 docker pull melihemreguler/urlshortener-backend:latest
+          }
           
           echo "Pulling frontend image..."
-          docker pull melihemreguler/urlshortener-frontend:latest
+          timeout 300 docker pull melihemreguler/urlshortener-frontend:latest || {
+            echo "Frontend image pull failed or timed out, retrying..."
+            timeout 300 docker pull melihemreguler/urlshortener-frontend:latest
+          }
 
           # Start new containers
           echo "Starting new containers..."
