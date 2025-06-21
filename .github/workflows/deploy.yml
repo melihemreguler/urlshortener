@@ -167,6 +167,13 @@ jobs:
           echo "Starting new containers..."
           docker compose -f docker-compose.yaml up -d --no-build
           
+          # Update frontend runtime configuration
+          echo "Updating frontend runtime configuration..."
+          docker exec urlshortener-frontend sh -c "echo 'window.ENV = { VITE_API_URL: \"https://urlshortener.melihemre.dev/api\" };' > /usr/share/nginx/html/config.js"
+          
+          # Restart nginx to ensure config is loaded
+          docker exec urlshortener-frontend nginx -s reload
+          
           # Show what containers are running
           echo "Running containers after start:"
           docker compose -f docker-compose.yaml ps
