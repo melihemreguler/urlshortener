@@ -1,9 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://admin:secret@mongodb:27017/urlshortenerdb?authSource=admin}
-  mvc:
-    throw-exception-if-no-handler-found: true
+      uri: ${MONGODB_URI:mongodb://admin:secret@localhost:27017/urlshortenerdb?authSource=admin}
+      database: ${MONGODB_DATABASE:urlshortenerdb}
   web:
     resources:
       add-mappings: false

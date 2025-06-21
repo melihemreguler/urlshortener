@@ -105,6 +105,7 @@ jobs:
           # Create .env.production file with secrets
           echo "Creating .env.production file..."
           echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" > .env.production
+          echo "MONGODB_DATABASE=urlshortenerdb" >> .env.production
           echo "SERVICE_URL=${{ secrets.SERVICE_URL }}" >> .env.production
           echo "SPRING_PROFILES_ACTIVE=production" >> .env.production
           echo "VITE_API_URL=https://urlshortener.melihemre.dev/api" >> .env.production
