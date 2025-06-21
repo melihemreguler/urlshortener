@@ -27,7 +27,7 @@ if (import.meta.env.DEV) {
 }
 
 // Swagger UI URL
-export const SWAGGER_UI_URL = `${API_BASE_URL}/swagger-ui/index.html`;
+export const SWAGGER_UI_URL = `${API_BASE_URL}/swagger-ui.html`;
 
 // API endpoints
 export const API_ENDPOINTS = {

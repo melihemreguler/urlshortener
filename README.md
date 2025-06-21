@@ -114,7 +114,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 3. **Access the applications:**
    - **Frontend**: http://localhost:3000
    - **Backend API**: http://localhost:8080
-   - **API Documentation**: http://localhost:8080/swagger-ui/index.html
+   - **API Documentation**: http://localhost:8080/swagger-ui.html
    - **MongoDB**: localhost:27017 (admin/secret)
 
 ### Production Deployment (with MongoDB Atlas)
@@ -192,7 +192,7 @@ LETSENCRYPT_EMAIL=your_email@domain.com
 4. **Access the applications:**
    - **Frontend**: https://urlshortener.melihemre.dev
    - **Backend API**: https://urlshortener.melihemre.dev/api
-   - **API Documentation**: https://urlshortener.melihemre.dev/api/swagger-ui/index.html
+   - **API Documentation**: https://urlshortener.melihemre.dev/api/swagger-ui.html
 
 ### Switching Between Environments
 
@@ -292,7 +292,7 @@ npm run dev
 - **Response:** `"pong"`
 
 ### Interactive Documentation
-- **Swagger UI**: http://localhost:8080/swagger-ui/index.html
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
 - **OpenAPI Specs**: http://localhost:8080/v3/api-docs
 
 ## Database Schema
