@@ -27,16 +27,18 @@ if (import.meta.env.DEV) {
 }
 
 // Swagger UI URL
-export const SWAGGER_UI_URL = `${API_BASE_URL}/swagger-ui/index.html`;
+export const SWAGGER_UI_URL = `${API_BASE_URL}/swagger-ui.html`;
 
 // API endpoints
 export const API_ENDPOINTS = {
-  URLS: `${API_BASE_URL}/api/url`,
-  SEARCH: `${API_BASE_URL}/api/url/search`,
-  DELETE_URL: (id: string) => `${API_BASE_URL}/api/url/${id}`,
+  URLS: `${API_BASE_URL}/url`,
+  SEARCH: `${API_BASE_URL}/url/search`,
+  DELETE_URL: (id: string) => `${API_BASE_URL}/url/${id}`,
 } as const;
 
 // Helper function to create short URL from shortCode
 export const buildShortUrl = (shortCode: string): string => {
-  return `${API_BASE_URL}/${shortCode}`;
+  // Short URLs should use the base domain without /api path for redirects
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  return `${baseUrl}/${shortCode}`;
 };
