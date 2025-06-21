@@ -12,6 +12,8 @@ public class IndexController {
     @GetMapping("/")
     public RedirectView redirectToSwagger() {
         log.info("Redirecting to Swagger UI");
-        return new RedirectView("api/swagger-ui.html");
+        RedirectView redirectView = new RedirectView("/api/swagger-ui.html");
+        redirectView.setContextRelative(false);
+        return redirectView;
     }
 }
