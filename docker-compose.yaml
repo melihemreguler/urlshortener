@@ -9,6 +9,8 @@ services:
       - MONGODB_DATABASE=${MONGODB_DATABASE:-urlshortenerdb}
       - SERVICE_URL=${SERVICE_URL}
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NEW_RELIC_APP_NAME=URLShortener Backend
       - VIRTUAL_HOST=urlshortener.melihemre.dev
       - VIRTUAL_PATH=/api
       - VIRTUAL_PORT=8080
@@ -23,11 +25,29 @@ services:
       - urlshortener-backend
     environment:
       - VITE_API_URL=${VITE_API_URL}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
       - VIRTUAL_HOST=urlshortener.melihemre.dev
       - LETSENCRYPT_HOST=urlshortener.melihemre.dev
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-guler@melihemre.dev}
     networks:
       - web
+
+  newrelic-infra:
+    container_name: newrelic-infra
+    build:
+      context: .
+      dockerfile: newrelic-infra.dockerfile
+    cap_add:
+      - SYS_PTRACE
+    network_mode: bridge
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: unless-stopped
+    environment:
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
 
 networks:
   web:
