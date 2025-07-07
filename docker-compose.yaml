@@ -45,6 +45,9 @@ services:
     restart: unless-stopped
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NRIA_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NRIA_VERBOSE=1
+      - NRIA_DISPLAY_NAME=urlshortener-ec2
     networks:
       - web
 
