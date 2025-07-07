@@ -1,0 +1,3 @@
+license_key: ${NEW_RELIC_LICENSE_KEY}
+display_name: urlshortener-ec2
+verbose: 1
