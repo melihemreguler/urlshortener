@@ -33,13 +33,10 @@ services:
       - web
 
   newrelic-infra:
+    image: melihemreguler/urlshortener-newrelic-infra:latest
     container_name: newrelic-infra
-    build:
-      context: .
-      dockerfile: newrelic-infra.dockerfile
     cap_add:
       - SYS_PTRACE
-    network_mode: bridge
     pid: host
     privileged: true
     volumes:
@@ -48,6 +45,8 @@ services:
     restart: unless-stopped
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+    networks:
+      - web
 
 networks:
   web:
