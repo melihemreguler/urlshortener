@@ -112,6 +112,7 @@ jobs:
           echo "BACKEND_PORT=8080" >> .env.production
           echo "FRONTEND_PORT=3000" >> .env.production
           echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env.production
+          echo "NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}" >> .env.production
 
           # Verify .env.production was created
           echo "Verifying .env.production file..."
@@ -139,6 +140,7 @@ jobs:
           export BACKEND_PORT="8080"
           export FRONTEND_PORT="3000"
           export LETSENCRYPT_EMAIL="${{ secrets.LETSENCRYPT_EMAIL }}"
+          export NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
 
           # Stop only urlshortener app containers (preserve nginx-proxy and others)
           echo "Stopping urlshortener app containers..."
@@ -149,6 +151,11 @@ jobs:
           docker rmi melihemreguler/urlshortener-backend:latest 2>/dev/null || true
           docker rmi melihemreguler/urlshortener-frontend:latest 2>/dev/null || true
           docker builder prune -f || true
+
+          # Create New Relic configuration file with license key
+          echo "Creating New Relic configuration..."
+          sed "s/\${NEW_RELIC_LICENSE_KEY}/${{ secrets.NEW_RELIC_LICENSE_KEY }}/g" newrelic-infra.yml > newrelic-infra-temp.yml
+          mv newrelic-infra-temp.yml newrelic-infra.yml
 
           # Pull latest images (one at a time to manage disk space)
           echo "Pulling backend image..."
@@ -169,7 +176,7 @@ jobs:
           
           # Update frontend runtime configuration
           echo "Updating frontend runtime configuration..."
-          docker exec urlshortener-frontend sh -c "echo 'window.ENV = { VITE_API_URL: \"https://urlshortener.melihemre.dev/api\" };' > /usr/share/nginx/html/config.js"
+          docker exec urlshortener-frontend sh -c "echo 'window.ENV = { VITE_API_URL: \"https://urlshortener.melihemre.dev/api\", NEW_RELIC_LICENSE_KEY: \"${{ secrets.NEW_RELIC_LICENSE_KEY }}\" };' > /usr/share/nginx/html/config.js"
           
           # Restart nginx to ensure config is loaded
           docker exec urlshortener-frontend nginx -s reload
