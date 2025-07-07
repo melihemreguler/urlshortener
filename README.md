@@ -31,6 +31,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
   - [Database Configuration](#database-configuration)
 - [Error Handling](#error-handling)
 - [Internationalization](#internationalization)
+- [Monitoring & Observability](#monitoring--observability)
 - [Architecture](#architecture)
 - [Performance Features](#performance-features)
 - [Future Enhancements](#future-enhancements)
@@ -64,6 +65,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 - **Database**: MongoDB for reliable data persistence
 - **Environment Configuration**: Flexible configuration for different environments
 - **CORS Support**: Properly configured cross-origin resource sharing
+- **Monitoring**: New Relic full-stack monitoring (Infrastructure, APM, Browser)
 
 ## Technologies Used
 
@@ -88,6 +90,7 @@ A full-stack URL shortener application built with Java Spring Boot (backend) and
 - **Docker & Docker Compose** - Containerization and orchestration
 - **MongoDB 6.0.20** - Document database
 - **Nginx** - Frontend web server (in production container)
+- **New Relic** - Full-stack monitoring and observability platform
 
 ## Prerequisites
 
@@ -179,15 +182,19 @@ EC2_SSH_KEY=your_private_ssh_key_content
 # Application Environment
 MONGODB_URI=your_mongodb_atlas_connection_string
 SERVICE_URL=https://urlshortener.melihemre.dev
-VITE_API_URL=https://urlshortener.melihemre.dev
+VITE_API_URL=https://urlshortener.melihemre.dev/api
 LETSENCRYPT_EMAIL=your_email@domain.com
+
+# Monitoring
+NEW_RELIC_LICENSE_KEY=your_newrelic_license_key
 ```
 
 ** Deployment Process:**
 1. Push code to `main` branch
-2. GitHub Actions automatically builds and pushes Docker images
+2. GitHub Actions automatically builds and pushes Docker images (including New Relic monitoring)
 3. Connects to EC2 and updates the application
-4. Runs health checks to verify deployment
+4. Deploys full-stack monitoring with New Relic
+5. Runs health checks to verify deployment
 
 4. **Access the applications:**
    - **Frontend**: https://urlshortener.melihemre.dev
@@ -427,6 +434,24 @@ The frontend supports multiple languages:
 - **Turkish**
 
 Language detection is automatic based on browser settings, with manual switching available.
+
+## Monitoring & Observability
+
+The application includes comprehensive **New Relic** monitoring for optimal performance and reliability:
+
+### Key Monitoring Features
+- **Infrastructure**: Server metrics, Docker containers, system resources
+- **APM**: Backend performance, database queries, transaction tracing  
+- **Browser**: Frontend performance, user experience, JavaScript errors
+- **Alerts**: Real-time notifications for performance thresholds
+
+### Metrics Tracked
+- Response times and throughput
+- Error rates and Apdex scores
+- Resource utilization (CPU, memory, disk)
+- Database performance and query optimization
+
+**Access Dashboard:** [New Relic Monitoring](https://one.newrelic.com)
 
 ## Architecture
 
