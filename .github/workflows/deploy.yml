@@ -154,6 +154,7 @@ jobs:
           export FRONTEND_PORT="3000"
           export LETSENCRYPT_EMAIL="${{ secrets.LETSENCRYPT_EMAIL }}"
           export NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
+          export NRIA_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
 
           # Stop only urlshortener app containers (preserve nginx-proxy and others)
           echo "Stopping urlshortener app containers..."
@@ -165,11 +166,6 @@ jobs:
           docker rmi melihemreguler/urlshortener-frontend:latest 2>/dev/null || true
           docker rmi melihemreguler/urlshortener-newrelic-infra:latest 2>/dev/null || true
           docker builder prune -f || true
-
-          # Create New Relic configuration file with license key
-          echo "Creating New Relic configuration..."
-          sed "s/\${NEW_RELIC_LICENSE_KEY}/${{ secrets.NEW_RELIC_LICENSE_KEY }}/g" newrelic-infra.yml > newrelic-infra-temp.yml
-          mv newrelic-infra-temp.yml newrelic-infra.yml
 
           # Pull latest images (one at a time to manage disk space)
           echo "Pulling backend image..."
