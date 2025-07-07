@@ -50,3 +50,17 @@ cors:
       - "X-Requested-With"
     credentials: true
     max-age: 3600
+
+newrelic:
+  config:
+    license_key: ${NEW_RELIC_LICENSE_KEY:}
+    app_name: URLShortener Backend
+    log_file_name: newrelic_agent.log
+    audit_mode: false
+    log_level: info
+    enable_auto_app_naming: false
+    enable_auto_transaction_naming: true
+    labels:
+      environment: ${SPRING_PROFILES_ACTIVE:development}
+      team: melihemre
+      service: urlshortener-backend
