@@ -1,3 +1,4 @@
-license_key: ${NEW_RELIC_LICENSE_KEY}
+# License key will be provided via NRIA_LICENSE_KEY environment variable
+# license_key: ${NEW_RELIC_LICENSE_KEY}
 display_name: urlshortener-ec2
 verbose: 1
